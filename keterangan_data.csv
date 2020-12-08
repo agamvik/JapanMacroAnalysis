@@ -1,0 +1,13 @@
+,Nama,Satuan,Tahun yang Tersedia,Tanggal Pemutakhiran Terbaru,Sumber
+Y,GDP DN,JPY,1960-2018,17-Apr-20,https://data.worldbank.org/indicator/NY.GDP.MKTP.KN?locations=JP
+C,Konsumsi,JPY,1970-2018,17-Apr-20,https://data.worldbank.org/indicator/NE.CON.PRVT.KN?locations=JP
+I,Investasi,JPY,1970-2018,17-Apr-20,https://data.worldbank.org/indicator/NE.GDI.TOTL.KN?locations=JP
+G,Belanja Pemerintah,JPY,1970-2018,17-Apr-20,https://data.worldbank.org/indicator/NE.CON.GOVT.KN?locations=JP
+X,Ekspor,JPY,1970-2018,17-Apr-20,https://data.worldbank.org/indicator/NE.EXP.GNFS.KN?locations=JP
+IM,Impor,JPY,1970-2018,17-Apr-20,https://data.worldbank.org/indicator/NE.IMP.GNFS.KN?locations=JP
+CPI,Indeks Harga Konsumen,N/A,1960-2019,17-Apr-20,https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=JP
+i,Suku Bunga DN,%,"1961-2017,2019",17-Apr-20,https://data.worldbank.org/indicator/FR.INR.RINR?locations=JP
+M,Jumlah Uang,JPY,1960-2019,17-Apr-20,https://data.worldbank.org/indicator/FM.LBL.BMNY.CN?locations=JP
+YL,GDP LN,JPY,1960-2018,17-Apr-20,https://data.worldbank.org/indicator/NY.GDP.MKTP.KN?locations=CN
+iL,Suku Bunga LN,%,1980-2018,17-Apr-20,https://data.worldbank.org/indicator/FR.INR.LEND?locations=CN
+E,Nilai Tukar,1 RMB/CNY,2003-2019,17-Apr-20,https://au.finance.yahoo.com/quote/JPYCNY=X/history?p=JPYCNY=X&.tsrc=fin-srch

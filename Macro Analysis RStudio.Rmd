@@ -1,0 +1,571 @@
+---
+title: "ANALISIS MAKROEKONOMI NEGARA JEPANG"
+author: "Kelompok 9 Makroekonomi Aktuaria ITB"
+date: "3/13/2020"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 3
+    fig_width: 4
+  html_document:
+    df_print: paged
+linestretch: 1.3
+---
+
+# Anggota Kelompok
+- Marcellius Kevin Chandra (10818007)
+- Faisal Zaidan Pradana (10818008)
+- Muhammad Agam Islami Al Mutaqin (10818033)
+- Muhammad Ilham (10818035)
+- Allif Khoirul Anaam (10818040)
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE)
+```
+
+#  1. Pemuatan Data
+## 1.1
+- Negara yang dikaji  : Jepang
+- Negara mitra dagang : China
+
+Package:
+```{r} 
+library(tidyverse)
+library(systemfit)
+library(knitr)
+```
+
+## 1.2-1.3 Data Negara Jepang
+```{r, results='asis'} 
+data = read.csv("C:/Users/ragil/Documents/Jpan.csv")
+kable(data[50:59,1:5])
+kable(data[50:59,c(1,6:9)])
+kable(data[50:59,c(1,10:13)])
+```
+
+## Deskripsi Data
+```{r}
+desk = read.csv("C:/Users/ragil/Documents/keterangan_data.csv")
+kable(desk[,1:5])
+kable(desk[,c(1,6)])
+```
+
+## 1.4 
+Tanggal Terakhir Pemutakhiran Data: 17 April 2020
+
+## 1.5-1.6 Penyimpanan Data ke File `.Rda`
+```{r, results='asis'}
+save(data,file="Jpan.Rda")
+```
+
+## 1.7 Penambahan Variabel Baru
+```{r, results='asis'}
+data = data %>% mutate(YLD = YL/E)
+data = data %>% mutate(RM = M/CPI)
+kable(data[50:59,1:5])
+kable(data[50:59,c(1,6:9)])
+kable(data[50:59,c(1,10:13)])
+kable(data[50:59,c(1,14:15)])
+```
+
+## Overview Ekonomi Jepang
+Pada tahun 1945, Jepang di Bom Atom oleh Amerika di kota Hiroshima dan Nagashaki. Kedua kota tersebut merupakan penyangga ekonomi jepang pada saat itu, sehingga perekonomian jepang sempat jatuh. Akan tetapi Jepang dengan bantuan sekutunya berhasil membangkitkan kembali perekonomian dengan sangat pesat hingga tahun 1990 dengan ditandai penguasaan pasar mobil dan elektronik pada saat itu.
+Naiknya perekonomian jepang ini ternyata berhenti di tahun 1990. Pada sekitar awal 1991 hingga sekarang, kenaikan GDP jepang tidak sepesat kenaikannya pada jaman dulu. Jepang kesulitan untuk mempertahankan pertumbuhan GDP nya. Hal ini sering disebut sebagai kondisi THE GREAT STAGNATION. Upaya terkenal yang dilakukan jepang untuk mengembalikan pertumbuhan GDP yang tinggi tersebut adalah dengan menurunkan tingkat suku bunga bahkan hingga dibawah 10% dengan tujuan agar masyarakatnya banyak meminjamkan uang lalu konsumsi meningkat sehingga GDP dapat naik secara pesat lagi. Akan tetapi terlihat bahwa upaya tersebut kurang efektif dalam mendorong naiknya GDP Jepang. Tentu Hal ini menjadi bahasan yang sangat menarik untuk di analisis lebih lanjut.
+
+#  2. Sektor Riil
+## 2.1
+
+Diketahui sistem persamaan Model Keynes standar:
+$$Y = {Z}...(1)$$
+
+$$Z = {C(Y) + I(Y,i) + G + NX}...(2)$$
+
+$$NX = {X(Y_L,E)-IM(Y)}...(3)$$
+
+$$C = {c_0 + c_1Y}...(4)$$
+
+$$I = {a + bY - di}...(5)$$
+
+dengan ${0<c_1,b<1}$
+
+substitusi (1), (3), (4), (5) $->$ (2)
+
+$$Y = {c_0 + c_1Y + a + bY - di + G + X(Y_L,E)-IM(Y)}...(*)$$
+
+$$Y = {1\over1-c_1-b}{(c_0 + a - di + G + X(Y_L,E)-IM(Y))}...(**)$$
+
+dengan ${X(Y_L,E)}$ dan ${IM(Y)}$ merupakan fungsi yang belum dijabarkan (akan dilakukan penurunan yang lebih lengkap pada soal selanjutnya).
+
+## Dari hasil penurunan sistem persamaan tersebut, diperoleh
+- Prediktor: $i$, $G$, $Y_L$, $E$
+- Respon: $Y$
+
+## 2.2a Plot $Y$ terhadap $C$ dan $I$
+### Plot $Y$ terhadap $C$
+
+```{r, fig.cap="*Scatter plot* GDP terhadap belanja rumah tangga negara Jepang."}
+plot(data$C,data$Y,xlab='C (JPY)',ylab='Y (JPY)')
+```
+
+Dapat dilihat bahwa plot $Y$ terhadap $C$ terus naik secara signifikan. GDP negara Jepang terus bertambah seiring bertambahnya Konsumsi.
+
+### Plot $Y$ terhadap $I$
+
+```{r, fig.cap="*Scatter plot* GDP terhadap investasi negara Jepang."}
+plot(data$I,data$Y,xlab='I (JPY)',ylab='Y (JPY)')
+```
+
+Meskipun sedikit sulit divisualisasikan, dapat dilihat bahwa plot $Y$ terhadap $C$ terus naik secara signifikan. GDP negara Jepang terus bertambah seiring bertambahnya Investasi.
+
+## 2.2b Plot $I$ terhadap $i$
+
+```{r, fig.cap="*Scatter plot* investasi terhadap suku bunga negara Jepang."}
+plot(data$i,data$I,xlab='i (%)',ylab='I (JPY)')
+```
+
+Hasil plot Investasi $(I)$ terhadap suku bunga $(i)$ masih terlihat sulit untuk divisualisasikan, oleh karena itu harus digunakan estimasi parameter untuk melihat hubungan linier antara $I$ dengan $i$.
+
+## 2.3a Model Linier $C$ terhadap $Y$
+```{r}
+(model.cy = lm(C~Y,data))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model :
+$$C(Y) = {2.206*10^{12} + (5.614*10^{-1})Y}$$
+Menurut model tersebut diperkirakan bahwa jika $Y$ naik 1 JPY maka $C$ akan naik `r model.cy$coefficients[2]` JPY.
+
+## 2.3b Model Linier $I$ terhadap $Y$ dan $i$
+```{r}
+(model.iy = lm(I~Y+i,data))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model :
+$$I(Y,i) = {3.937*10^{13} + (1.794*10^{-1})Y + (7.38*10^{11})i}$$
+Menurut model tersebut diperkirakan bahwa jika $i$ naik 1 % maka $I$ akan naik `r model.iy$coefficients[2]` JPY, dan jika $Y$ naik 1 JPY maka $I$ akan naik `r model.iy$coefficients[3]` JPY.
+
+## 2.4a Pencocokan Model dengan Data $C$ terhadap $Y$
+
+```{r, fig.cap="Grafik kecocokan model belanja rumah tangga terhadap GDP negara Jepang."}
+plot(data$Y,data$C,xlab='Y (JPY)',ylab='C (JPY)')
+abline(model.cy)
+```
+
+Secara visual, kecocokan model terlihat sangat baik dengan dekatnya nilai model dengan plot kasar $C-Y$. Tidak terlihat titik dengan nilai yang sangat jauh dari model. Secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $C-Y$ dengan baik.
+
+```{r}
+summary(model.cy)
+```
+Walaupun hasil model dapat dikatakan cocok dengan data $Y-C$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap data $Y-C$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $Y-C$ secara signifikan. 
+Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $Y$ $< \alpha$ sehingga sudah dapat dikatakan signifikan. Berbeda dengan nilai *p-value intercept* yang bernilai $> \alpha$ sehingga dapat dikatakan *intercept* tidak signifikan dan bisa kita anggap 0.
+
+## 2.4b Pencocokan Model dengan Data $I$ terhadap $Y$ dan $i$
+
+```{r, fig.cap="Grafik kecocokan model investasi negara Jepang."}
+I.hat = model.iy$coefficients[1]+model.iy$coefficients[2]*data$Y+model.iy$coefficients[3]*data$i
+plot(data$I,xlab='t (tahun)',ylab='I (JPY)')
+lines(I.hat,xlab='t (tahun)',ylab='I (JPY)',type='l')
+```
+
+Secara visual, kecocokan model terlihat kurang baik dengan jauhnya nilai $I$ dan $I.hat$ pada tiap waktu. Walaupun perlu diperhatikan untuk beberapa titik terdapat nilai yang cukup dekat. Akan tetapi menurut kami secara garis besar model tersebut belum dapat memperlihatkan pola pergerakan $I$ secara baik.
+
+```{r}
+summary(model.iy)
+```
+Walaupun hasil model belum terlihat cocok dengan data $I$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang signifikan terhadap $I$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan mempengaruhi nilai $I$ secara signifikan.
+Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $Y$ dan *intercept* $< \alpha$ sehingga sudah dapat dikatakan signifikan. Berbeda dengan nilai p-value $i$ yang bernilai $> \alpha$ sehingga dapat dikatakan $i$ tidak signifikan dan $i$ tidak mempengaruhi $I$ secara signifikan. Hal ini sudah terlihat dari awal *plotting* dimana *scatter plot* $I$ terhadap $i$ tidak menunjukan pola berkorelasi.
+Sehingga menurut kami, Jepang memiliki kebijakan tersendiri untuk menentukan $I$ tanpa melihat nilai $i$. Perlu ditekankan bahwa tidak setiap negara memiliki model yang sama untuk perekonomiannya, dan pada negara Jepang terlihat bahwa ternyata nilai $i$ tidak mempengaruhi nilai $I$ secara signifikan.
+
+## 2.5a Plot $IM$ terhadap $Y$
+
+```{r, fig.cap="*Scatter plot* impor terhadap GDP negara Jepang."}
+plot(data$Y,data$IM,xlab='Y (JPY)',ylab='IM (JPY)')
+```
+
+Dapat dilihat bahwa plot $Y$ terhadap $IM$ terus naik secara signifikan. GDP negara Jepang terus bertambah seiring bertambahnya impor.
+
+### Plot $IM$ terhadap $Y$ (Transormasi)
+
+```{r, fig.cap="*Scatter plot* impor terhadap GDP negara Jepang (transformasi)."}
+plot(data$Y^4,data$IM,xlab='Y^4 (JPY^4)',ylab='IM (JPY)')
+```
+
+Pada plot transformasi, tren fungsi kuadratnya sudah tidak terlihat.
+
+## 2.5b Plot $X$ terhadap $Y_L'$
+
+```{r, fig.cap="*Scatter plot* ekspor terhadap GDP negara mitra dagang."}
+plot(data$YLD,data$X,xlab='YL\'',ylab='X (JPY)')
+```
+
+Dapat dilihat bahwa plot $X$ terhadap $Y_L’$ terus naik secara signifikan. GDP negara mitra dagang terus bertambah seiring bertambahnya ekspor.
+
+## 2.6a Model Linier $IM$ terhadap $Y$
+```{r}
+(model.imy = lm(IM~Y,data))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model :
+$$IM(Y) = -3.253*10^{13} + (2.106*10^{-1})Y$$
+Menurut model tersebut diperkirakan bahwa jika $Y$ naik 1 JPY maka $IM$ akan naik `r model.imy$coefficients[2]` JPY.
+```{r}
+yy = data$Y^4
+(model.imy4 = lm(data$IM~yy))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model transformasi :
+$$IM(Y) = 1.677*10^{13} + (9.259*10^{-46})Y^4$$
+Menurut model tersebut diperkirakan bahwa jika $Y$ naik 1 JPY maka $IM$ akan naik `r model.imy4$coefficients[2]` JPY.
+
+
+## 2.6b Model Linier $X$ terhadap $Y_L'$
+```{r}
+(model.xyl = lm(X~YLD,data))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model :
+$$X(Y_L') = 5.749*10^{13} + (4.636*10^{7})YLD$$
+Menurut model tersebut diperkirakan bahwa jika $Y_L'$ naik 1 JPY maka $X$ akan naik `r model.xyl$coefficients[2]` JPY.
+
+## 2.7a Pencocokan Model dengan Data $IM$ terhadap $Y$
+
+```{r, fig.cap="Grafik kecocokan model impor terhadap GDP negara Jepang."}
+plot(data$Y, data$IM,xlab='Y (JPY)',ylab='IM (JPY)')
+abline(model.imy)
+```
+
+Secara visual, kecocokan model terlihat cukup baik dengan dekatnya nilai model dengan plot kasar $IM$ terhadap $Y$. Tidak terlihat titik dengan nilai yang sangat jauh dari model. Secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $IM$ terhadap $Y$ dengan baik.
+
+```{r}
+summary(model.imy)
+```
+Walaupun hasil model dapat dikatakan cocok dengan data $IM$ terhadap $Y$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap data $IM$ terhadap $Y$, sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $IM$ terhadap $Y$ secara signifikan. 
+Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $Y$ dan *intercept* $< \alpha$ sehingga sudah dapat dikatakan signifikan.
+Dari nilai $R^2$, terlihat bahwa nilai dari $R^2$ sebesar 0.8752. Dari nilai tersebut, dapat dikatakan bahwa model regresi tersebut cocok dengan data yang diperoleh.
+
+### Pencocokan Model dengan Data $IM$ terhadap $Y$ (Transormasi)
+
+```{r, fig.cap="Grafik kecocokan model impor terhadap GDP negara Jepang (transformasi)."}
+plot(data$Y^4, data$IM,xlab='Y^4 (JPY^4)',ylab='IM (JPY)')
+abline(model.imy4)
+```
+
+Plot transformasi sudah lebih linier dari plot sebelum transformasi, tren kelinieran sudah mulai terlihat. Sehingga dapat dikatakan model sudah cukup baik.
+
+```{r}
+summary(model.imy4)
+```
+Model transformasi sudah cukup menunjukkan tren linearnya. Garis model dengan plotnya pun tidak terlihat jarak yang cukup signifikan sehingga dapat dikatakan bahwa model transformasi sudah cukup baik.
+Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $Y$ dan *intercept* $< \alpha$ sehingga sudah dapat dikatakan signifikan.
+Dari nilai $R^2$, terlihat bahwa nilai dari $R^2$ sebesar 0.9885. Dari nilai tersebut, dapat dikatakan bahwa model regresi tersebut cocok dengan data yang diperoleh.
+
+## 2.7b Pencocokan Model dengan Data $X$ terhadap $Y_L'$
+
+```{r, fig.cap="Grafik kecocokan model ekspor terhadap  GDP negara mitra dagang."}
+plot(data$YLD, data$X,xlab='YL\' (RMB/CNY)',ylab='Y (JPY)')
+abline(model.xyl)
+```
+
+Plot bisa dibilang sudah cukup baik karena tidak terlihat perbedaan jarak yang cukup signifikan antara model dengan data sebenarnya.
+
+```{r}
+summary(model.xyl)
+```
+Walaupun hasil model dapat dikatakan cocok dengan data $Y_L'$ terhadap $X$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap data $Y_L'$ terhadap $X$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $Y-C$ secara signifikan. 
+Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0.05$), terlihat bahwa nilai *p-value* untuk $Y$ dan *intercept* $< \alpha$ sehingga sudah dapat dikatakan signifikan.
+Dari nilai $R^2$, terlihat bahwa nilai dari $R^2$ sebesar 0.7825. Dari nilai tersebut, dapat dikatakan bahwa model regresi tersebut cocok dengan data yang diperoleh.
+
+## 2.8 
+Melanjutkan penurunan pada no. 2.1 dengan anggapan bahwa ${X(Y_L,E)}$ dan ${IM(Y)}$ merupakan fungsi linier :
+
+$$IM = {m_0 + m_1Y}...(6)$$
+
+$$X = {x_0 + x_1Y'_L}...(7)$$
+
+substitusi (6), (7) $->$ (*)
+$$Y = {c_0 + c_1Y + a + bY - di + G + x_0 + x_1Y'_L - m_0 - m_1Y}$$
+
+$$Y = {1\over1-c_1-b+m_1}{(c_0 + a - di + G + x_0 + x_1Y'_L - m_0)}...(IS)$$
+
+## 2.9 Plot $Y$ terhadap Peubah-Peubah Prediktor
+### Plot $Y$ terhadap $i$
+
+```{r, fig.cap="*Scatter plot* GDP terhadap suku bunga negara Jepang."}
+plot(data$i,data$Y,xlab='i (%)',ylab='Y (JPY)')
+```
+
+Dari hasil plot, dapat dilihat bahwa plot $Y$ terhadap $i$ terlihat sulit untuk divisualisasikan, sehingga perlu dilakukan estimasi parameter untuk melihat hubungan linier antara $Y$ dan $i$. 
+
+### Plot $Y$ terhadap $G$
+
+```{r, fig.cap="*Scatter plot* GDP terhadap belanja pemerintah negara Jepang."}
+plot(data$G,data$Y,xlab='G (JPY)',ylab='Y (JPY)')
+```
+
+Terlihat bahwa plot $Y$ terhadap $G$ terus naik secara signifikan. Sehingga terlihat bahwa GDP negara Jepang terus bertambah seiring bertambahnya belanja pemerintah.
+
+### Plot $Y$ terhadap $Y_L'$
+
+```{r, fig.cap="*Scatter plot* GDP negara Jepang terhadap GDP negara mitra dagang."}
+plot(data$YLD,data$Y,xlab='YL\' (JPY)',ylab='Y (JPY)')
+```
+
+Dapat dilihat bahwa plot $Y$ terhadap $Y_L’$ terus naik secara signifikan. GDP Jepang terus bertambah seiring bertambahnya GDP dari mitra dagang Jepang, yaitu Cina.
+
+## 2.10 Model Linier $Y$ terhadap Peubah-Peubah Prediktor
+```{r}
+(model.y = lm(Y~i+G+YLD,data))
+```
+Dari hasil estimasi parameter di RStudio, diperoleh model:
+$$Y(i,G,YLD) = 5.363*10^{14} - (1.400*10^{12})i - (0.6074)G + (7.507*10^7)Y_L'$$
+Menurut model tersebut diperkirakan bahwa jika $i$ naik 1% maka $Y$ akan berkurang `r model.y$coefficients[2]` JPY, sedangkan jika $G$ naik 1 JPY maka $Y$ akan berkurang `r model.y$coefficients[3]` JPY, dan jika $Y_L’$ naik 1 JPY, maka $Y$ akan naik `r model.y$coefficients[4]` JPY.
+
+## 2.11 Pencocokan Model dengan Data $Y$ terhadap Peubah-Peubah Prediktor
+
+```{r, fig.cap="Grafik kecocokan model GDP negara Jepang."}
+Y.hat = model.y$coefficients[1]+model.y$coefficients[2]*data$i+model.y$coefficients[3]*data$G+model.y$coefficients[4]*data$YLD
+plot(data$Y,xlab='t (tahun)',ylab='Y (JPY)')
+lines(Y.hat)
+```
+
+Secara visual, kecocokan model terlihat cukup baik dengan nilai $Y$ dan $Y.hat$ yang cukup dekat terhadap waktu. Walaupun pada beberapa titik terdapat nilai yang cukup jauh. Akan tetapi, secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $Y$ dengan baik. 
+```{r}
+summary(model.y)
+```
+Walaupun hasil model dapat terlihat cocok dengan data $Y$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap $Y$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $Y$ secara signifikan. 
+	Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $G$, $Y_L'$ dan $i$ $> \alpha$. Berbeda dengan nilai *p-value intercept* yang bernilai $< \alpha$ sehingga dapat dikatakan bahwa $Y$ dipengaruhi oleh *intercept*-nya. Dari hasil tersebut,dapat disimpulkan bahwa $Y$ tidak dipengaruhi oleh $G$, $i$ dan $Y_L'$ secara signifikan. 
+	Dari nilai $R^2$, terlihat bahwa nilai dari $R^2$ sebesar 0.7561. Dari nilai tersebut, dapat dikatakan bahwa model regresi tersebut cocok dengan data yang diperoleh.
+	Sehingga menurut kami, Jepang memiliki kebijakan tersendiri untuk menentukan $Y$ tanpa melihat nilai $i$, $G$ dan $Y_L'$. Jadi, pada negara Jepang, nilai $i$ tidak mempengaruhi nilai $Y$ secara signifikan.
+
+## 2.12 
+Dari persamaan $(IS)$, maka multipliernya adalah ${1\over1-c_1-b+m_1}$
+```{r}
+c1 = model.cy$coefficients[2]
+b = model.iy$coefficients[2]
+m1 = model.imy$coefficients[2]
+(multiplier = 1/(1 - c1 - b + m1))
+```
+Dari hasil perhitungan, diperoleh perkiraan nilai multiplier sebesar `r multiplier`
+
+## 2.13 Package `systemfit` untuk menghasilkan  estimasi-estimasi $C$, $I$, $X$, dan $IM$
+```{r}
+rumahtangga <- data$C~data$Y
+investasi <- data$I~data$Y+data$i
+ekspor <- data$X~data$YLD
+impor <- data$IM~data$Y
+sys <- list(rumahtangga, investasi, ekspor, impor)
+instr <- ~data$G+data$i+data$YLD
+keynes.sys <- systemfit(sys, inst=instr, method="2SLS")
+summary(keynes.sys)
+```
+
+## 2.14 Perbandingan hasil estimasi fungsi `lm` dan `systemfit`
+```{r}
+summary(keynes.sys$eq[[1]])
+summary(model.cy)
+```
+Pada hasil estimasi dari fungsi `systemfit` pada model $C(Y)$, terlihat bahwa terdapat perbedaan yang cukup besar terhadap nilai intercept pada model. Selain itu, terdapat perbedaan nilai p-value pada kedua parameter yang cukup besar. Hal tersebut justru menguatkan bukti bahwa nilai intercept tidak signifikan dan bisa kita anggap 0. Adapun nilai $R^2$ pada model `systemfit` lebih kecil dari model awal. Jadi, model yang lebih cocok adalah model awal karena nilai $R^2$ model tersebut lebih mendekati 1.
+```{r}
+summary(keynes.sys$eq[[2]])
+summary(model.iy)
+```
+Pada hasil estimasi dari fungsi `systemfit` pada model $I(Y,i)$, terlihat bahwa terdapat perbedaan yang cukup besar terhadap nilai intercept pada model. Selain itu, pada model `systemfit`, parameter $Y$ dan $i$ berbanding terbalik terhadap nilai $I$.  Selain itu, perhatikan bahwa nilai p-value untuk ketiga variabel pada `systemfit` jauh lebih besar dari pada model `lm`. Hal tersebut justru menyatakan bahwa nilai $Y$ dan $i$ tidak mempengaruhi nilai $I$ secara signifikan. Adapun pada nilai $R^2$ terdapat perbedaan yang signifikan pada model `systemfit` yang menyatakan bahwa $I$ berbanding terbalik terhadap $i$ & $Y$, namun model tersebut kurang cocok dengan data sebenarnya jika dibandingkan dengan model awal. Jadi, model regresi yang lebih cocok untuk data adalah model awal karena nilai $R^2$ model tersebut lebih mendekati 1.
+```{r}
+summary(keynes.sys$eq[[3]])
+summary(model.xyl)
+```
+Pada hasil estimasi dari fungsi `systemfit` pada model $X(Y_L')$, terlihat bahwa tidak terdapat perbedaan yang cukup besar terhadap nilai parameter pada kedua model. Namun, nilai p-value untuk kedua variabel pada `systemfit` lebih besar dari pada model `lm`. Walaupun demikian, nilai p-value kedua parameter pada model `systemfit` masih lebih kecil dari alpha sehingga tidak mengubah keputusan awal. Adapun nilai $R^2$ pada model `systemfit` lebih kecil dari model awal. Jadi, model yang lebih cocok adalah model awal karena nilai $R^2$ model tersebut lebih mendekati 1.
+```{r}
+summary(keynes.sys$eq[[4]])
+summary(model.imy)
+```
+Pada hasil estimasi dari fungsi `systemfit` pada model $IM(Y)$, terlihat bahwa terdapat perbedaan yang cukup signifikan terhadap nilai intercept pada kedua model. Selain itu, nilai p-value untuk kedua variabel pada `systemfit` lebih besar dari pada model lm. Walaupun demikian, nilai p-value kedua parameter pada model `systemfit` masih lebih kecil dari alpha sehingga tidak mengubah keputusan awal. Adapun nilai $R^2$ pada model `systemfit` lebih besar dari model awal. Jadi, model yang lebih cocok adalah model `systemfit` karena nilai $R^2$ model tersebut lebih mendekati 1.
+
+#  3. Sektor Finansial
+Diketahui bahwa Relasi LM memiliki bentuk sebagai berikut :
+
+$${M\over P} = {f(Y,i)}...(8)$$
+
+dengan fungsi $f(Y,i)$ yang masih belum diketahui. Dengan pertimbangan bahwa Relasi LM akan sama bentuknya pada setiap negara dan yang membedakan hanya fungsi ${f(Y,i)}$. Maka akan dicari fungsi ${f(Y,i)}$ yang sesuai untuk negara Jepang.
+
+Dengan asumsi awal fungsi ${f(Y,i)}$ merupakan fungsi linier :
+
+$${M\over P} = {eY - fi}...(LM)$$
+
+akan dicari nilai dari $e$ dan $f$
+
+untuk melihat hubungan antara $RM$ dengan $Y$ dan $i$ secara berturut-turut, maka akan dilakukan plot untuk melihat hubungan tersebut secara visual.
+
+## 3.1a Plot $RM$ terhadap $Y$
+
+```{r, fig.cap="*Scatter plot* uang riil terhadap GDP negara Jepang."}
+plot(data$Y,data$RM,xlab='Y (JPY)',ylab='RM (unit)')
+```
+
+Dari plot $RM$ terhadap $Y$, terlihat bahwa terdapat hubungan linear antara data $RM$ dengan $Y$ untuk negara Jepang dengan hubungan berbanding lurus. Sehingga dari grafik dapat disimpulkan bahwa saat nilai $Y$ naik, maka nilai $RM$ pun akan naik, dan sebaliknya.
+
+## 3.1b Plot $RM$ terhadap $i$
+
+```{r, fig.cap="*Scatter plot* uang riil terhadap suku bunga negara Jepang."}
+plot(data$i,data$RM,xlab='i (%)',ylab='RM (unit)')
+```
+
+Secara visual, sulit untuk melihat hubungan antara $RM$ dan $i$. Untuk itu, akan dilakukan estimasi parameter dengan menggunakan RStudio agar dapat ditentukan hubungan antara $RM$ dengan $Y$ dan $i$ sebagai hubungan linear.
+
+## 3.2 Model linier $RM$ terhadap $Y$ dan $i$
+```{r}
+(model.rm = lm(RM~Y+i,data))
+```
+Dari hasil estimasi parameter di Rstudio, diperoleh model :
+$${M\over P} = {-2.171*10^{12} + (2.659*10^{-2})Y - (9.731*10^{9})i}$$
+Menurut model tersebut diperkirakan bahwa jika $i$ naik 1 % maka $RM$ akan turun `r model.rm$coefficients[3]` unit, dan jika $Y$ naik 1 JPY maka $RM$ akan naik `r model.rm$coefficients[2]` unit.
+
+Selanjutnya akan dicek kecocokan model tersebut dengan data $RM$, dengan memasukkan tiap nilai $Y$ dan $i$ pada model tersebut dan memperoleh nilai $RM.hat$. Lalu nilai $RM$ dan $RM.hat$ di plot bersamaan untuk melihat kecocokan model tersebut.
+
+## 3.3 Pencocokan Model dengan Data $RM$ terhadap $Y$ dan $i$
+
+```{r, fig.cap="Grafik kecocokan model uang riil negara Jepang."}
+lm(RM~Y+I,data)
+rm.hat = data.frame(NA)
+for(k in 11:nrow(data)){
+  rm.hat[k,] = model.rm$coefficients[1]+model.rm$coefficients[2]*data$Y[k]+model.rm$coefficients[3]*data$i[k]
+}
+rmhat = ts(rm.hat[,1])
+plot(data$RM,xlab='t (tahun)',ylab='RM (unit)')
+lines(rmhat,xlab='t (tahun)',ylab='RM (unit)',type='l',col="blue")
+```
+
+Secara visual, kecocokan model terlihat cukup baik dengan dekatnya nilai $RM$ dan $RM.hat$ pada tiap waktu. Walaupun perlu diperhatikan untuk beberapa titik terdapat nilai yang cukup jauh. Akan tetapi menurut kami secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $RM$ secara baik.
+
+```{r}
+summary(model.rm)
+```
+
+  Walaupun hasil model dapat terlihat cocok dengan data $RM$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap $RM$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $RM$ secara signifikan. 
+	Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0,05$), terlihat bahwa nilai *p-value* untuk $e$ dan *intercept* $<\alpha$ sehingga sudah dapat dikatakan signifikan. Berbeda dengan nilai *p-value* $f$ yang bernilai $>\alpha$ sehingga dapat dikatakan $f$ tidak signifikan dan $i$ tidak mempengaruhi $RM$ secara signifikan. Hal ini sudah terlihat dari awal *plotting* dimana *scatter plot* $RM$ terhadap $i$ tidak menunjukan pola berkorelasi.
+	Lalu dilihat dari nilai *Adjusted R-squared* = 0,9787, dimana artinya $Y$ dan $i$ secara simultan berpengaruh terhadap variabel $RM$ sebesar 97,87%. Sedangkan sisanya (100%-97,87% = 2,13%) dipengaruhi oleh variabel lain di luar persamaan regresi linear yang kali ini kami teliti. Nilai 97,87% sangat besar untuk persentase pengaruh $Y$ dan $i$ terhadap $RM$. Dengan tidak signifikannya nilai $i$ terhadap $RM$, maka kami berpendapat bahwa sebagian besar dari 97,87% merupakan pengaruh dari $Y$ itu sendiri terhadap $RM$.
+	Sehingga menurut kami, Jepang memiliki kebijakan tersendiri untuk menentukan $RM$ tanpa melihat nilai $i$. Perlu ditekankan bahwa tidak setiap negara memiliki model yang sama untuk perekonomiannya, dan pada negara Jepang terlihat bahwa ternyata nilai $i$ tidak mempengaruhi nilai $RM$ secara signifikan.
+
+#  4. Model IS-LM
+## 4.1
+Dari bagian 2 dan 3, kita peroleh relasi IS-LM sebagai berikut :
+
+$$Y = {1\over1-c_1-b+m_1}{(c_0 + a - di + G + x_0 + x_1Y'_L-m_0)}...(IS)$$
+
+$${M\over P} = {eY - fi}$$
+
+$${Y} = {1\over e}[{M\over P} + fi]...(LM)$$
+
+## Dari hasil penurunan sistem persamaan tersebut, diperoleh
+- Prediktor: $G$, $Y_L$, $E$, $RM$
+- Respon: $Y$, $i$
+
+## 4.2
+Dengan menyelesaikan sistem persamaan (IS) dan (LM), maka akan diperoleh:
+
+$${i^*} = {{e(c_0 + a + G + x_0 + x_1Y'_L-m_0)-{M\over P}(1-c_1-b+m_1)}\over de + f(1-c_1-b-m_1)}$$
+
+$${Y^*} = {{{M\over P}d + f(c_0 + a + G + x_0 + x_1Y'_L-m_0)}\over de + f(1-c_1-b+m_1)}$$
+
+## 4.3a Plot $i$ terhadap $G$
+
+```{r, fig.cap="*Scatter plot* suku bunga terhadap belanja pemerintah negara Jepang."}
+plot(data$G,data$i,xlab='G (JPY)',ylab='i (%)')
+```
+
+Dari plot $i$ terhadap $G$, terlihat bahwa $i$ tidak berhubungan linier terhadap $G$. sehingga dapat disimpulkan bahwa $i$ tidak berubah jika $G$ naik atau turun. Namun masih terlihat pencilan pada plot tersebut. 
+
+## Plot $i$ terhadap $G$ (tanpa pencilan)
+
+```{r, fig.cap="*Scatter plot* suku bunga terhadap belanja pemerintah negara Jepang (tanpa pencilan)."}
+ii = data$i
+ii[14:15] = NA #Penghilangan pencilan
+ii[11]    = NA
+plot(data$G,ii,xlab='G (JPY)',ylab='i (%)')
+```
+
+Setelah pencilan dihilangkan, lebih sulit untuk melihat hubungan linier antara $i$ dan $G$ karena terdapat pencilan. Namun masih terdapat kecenderungan linier antara $i$ dan $G$.
+Untuk itu, akan digunakan fungsi `lm` untuk mengestimasi parameter persamaan linier antara $i$ dan $G$.
+
+## 4.3b Plot $i$ terhadap $Y_L'$
+
+```{r, fig.cap="*Scatter plot* suku bunga negara Jepang terhadap GDP negara mitra dagang."}
+plot(data$YLD,data$i,xlab='Y_L\' (JPY)',ylab='i (%)')
+```
+
+Walaupun data nampak sangat sedikit dari plot $i$ terhadap $Y_L’$, masih terlihat bahwa $i$ tidak berhubungan linier terhadap $Y_L’$. sehingga dapat disimpulkan bahwa $i$ tidak berubah jika $Y_L’$ naik atau turun. 
+
+## 4.3c Plot $i$ terhadap $RM$
+
+```{r, fig.cap="*Scatter plot* suku bunga terhadap uang riil negara Jepang."}
+plot(data$RM,data$i,xlab='RM (unit)',ylab='i (%)')
+```
+
+Dari plot $i$ terhadap $RM$, terlihat bahwa $i$ tidak berhubungan linier terhadap $RM$. sehingga dapat disimpulkan bahwa $i$ tidak berubah jika $RM$ naik atau turun. Namun masih terlihat pencilan pada plot tersebut. 
+
+## Plot $i$ terhadap $RM$ (tanpa pencilan)
+
+```{r, fig.cap="*Scatter plot* suku bunga terhadap uang riil negara Jepang (tanpa pencilan)."}
+plot(data$RM,ii,xlab='RM (unit)',ylab='i (%)')
+```
+
+Setelah pencilan dihilangkan, lebih sulit untuk melihat hubungan linier antara $i$ dan $RM$ karena terdapat pencilan. Namun masih terdapat kecenderungan linier antara $i$ dan $RM$.
+Untuk itu, akan digunakan fungsi `lm` untuk mengestimasi parameter persamaan linier antara $i$ dan $RM$.
+
+
+## 4.4a Model Linier $Y$ terhadap Peubah-Peubah Prediktor
+```{r}
+(model.Y = lm(Y~G+YLD+RM,data))
+```
+Dari hasil estimasi parameter di RStudio, diperoleh model:
+$$Y(G,Y_L',RM) = 5.382*10^{14} - 1.133G + (7.856*10^7)Y_L' + 4.07RM$$
+Menurut model tersebut diperkirakan bahwa jika $G$ naik 1 JPY maka $Y$ akan berkurang `r model.Y$coefficients[2]*(-1)` JPY, sedangkan jika $Y_L'$ naik 1 JPY maka $Y$ akan bertambah `r model.Y$coefficients[3]` JPY, dan jika $RM$ naik 1 unit, maka $Y$ akan naik `r model.Y$coefficients[4]` JPY.
+
+## 4.4b Model Linier $i$ terhadap Peubah-Peubah Prediktor
+```{r}
+(model.i = lm(i~G+YLD+RM,data))
+```
+Dari hasil estimasi parameter di RStudio, diperoleh model:
+$$i(G,Y_L',RM) = 13.99 - (1.769*10^{-13})G - (3.014*10^{-6})Y_L' + (6.355*10^{-13})RM$$
+Menurut model tersebut diperkirakan bahwa jika $G$ naik 1 JPY maka $i$ akan berkurang `r model.i$coefficients[2]*(-1)` %, sedangkan jika $Y_L'$ naik 1 JPY maka $i$ akan berkurang `r model.i$coefficients[3]*(-1)` %, dan jika $RM$ naik 1 unit, maka $i$ akan naik `r model.i$coefficients[4]` %.
+
+## 4.5a Pencocokan Model dengan Data $Y$ terhadap Peubah-Peubah Prediktor
+
+```{r, fig.cap="Grafik kecocokan model GDP negara Jepang."}
+Y.hat = model.Y$coefficients[1]+model.Y$coefficients[2]*data$G+model.Y$coefficients[3]*data$YLD+model.Y$coefficients[4]*data$RM
+plot(data$Y,xlab='t (tahun)',ylab='Y (JPY)')
+lines(Y.hat)
+```
+
+Secara visual, kecocokan model terlihat sangat baik dengan dekatnya nilai model dengan plot $Y$. Tidak terlihat titik dengan nilai yang sangat jauh dari model. Walaupun plot garis model yang nampak sangat pendek. Secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $Y$ dengan baik.
+
+```{r}
+summary(model.Y)
+```
+Walaupun hasil model dapat terlihat cocok dengan data $Y$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap $Y$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $Y$ secara signifikan. 
+	Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0.05$), terlihat bahwa nilai *p-value* untuk koefisien $G$, $Y_L'$, $RM$, yang bernilai $>\alpha$ sehingga dapat dikatakan koefisien-koefisien tersebut tidak signifikan. Berbeda dengan nilai *p-value* untuk *intercept* yang bernilai $<\alpha$ sehingga sudah dapat dikatakan signifikan.
+	Lalu dilihat dari nilai *Adjusted R-squared* = 0.7583, dimana artinya $G$, $Y_L'$, dan $RM$ secara simultan berpengaruh terhadap variabel $Y$ sebesar 75.83%. Sedangkan sisanya (100%-75.83% = 24.17%) dipengaruhi oleh variabel lain di luar persamaan regresi linear yang kali ini kami teliti. Nilai 75.83% cukup besar untuk persentase pengaruh $G$, $Y_L'$, dan $RM$ terhadap $Y$. Dengan tidak signifikannya pengaruh $G$, $Y_L'$, dan $RM$ terhadap $Y$, maka kami berpendapat bahwa model yang didapat belum cocok karena model tersebut terbatas dalam waktu yang pendek.
+	Sehingga menurut kami, Jepang memiliki kebijakan tersendiri untuk menentukan  tanpa melihat nilai $G$, $Y_L'$, dan $RM$. Perlu ditekankan bahwa tidak setiap negara memiliki model yang sama untuk perekonomiannya, dan pada negara Jepang terlihat bahwa ternyata nilai $G$, $Y_L'$, dan $RM$ tidak mempengaruhi nilai $Y$ secara signifikan.
+	
+## 4.5b Pencocokan Model dengan Data $i$ terhadap Peubah-Peubah Prediktor
+
+```{r, fig.cap="Grafik kecocokan model suku bunga negara Jepang."}
+i.hat = model.i$coefficients[1]+model.i$coefficients[2]*data$G+model.i$coefficients[3]*data$YLD+model.i$coefficients[4]*data$RM
+plot(data$i, xlab='t (tahun)',ylab='i (%)')
+lines(i.hat,col="blue")
+```
+
+Secara visual, kecocokan model terlihat cukup baik dengan dekatnya nilai model dengan plot $i$. Tidak terlihat titik dengan nilai yang sangat jauh dari model. Walaupun plot garis model yang nampak sangat pendek. Secara garis besar model tersebut sudah dapat memperlihatkan pola pergerakan $i$ dengan baik.
+
+```{r}
+summary(model.i)
+```
+
+  Walaupun hasil model dapat terlihat cocok dengan data $i$, akan tetapi perlu diingat bahwa ada kemungkinan terdapat koefisien yang tidak signifikan terhadap $i$ sehingga memungkinan adanya hipotesis bahwa variabel yang bersangkutan tidak mempengaruhi nilai $i$ secara signifikan. 
+	Dari nilai *p-value* tiap koefisien (asumsi $\alpha = 0.05$), terlihat bahwa nilai *p-value* untuk koefisien $G$, $Y_L'$, $RM$, dan *intercept* yang bernilai $>\alpha$ sehingga dapat dikatakan koefisien-koefisien tersebut tidak signifikan. Hal ini sudah terlihat dari awal plotting dimana scatter plot $i$ terhadap $G$, $Y_L'$, $RM$ tidak menunjukan pola berkorelasi.
+	Lalu dilihat dari nilai *Adjusted R-squared* = 0.475, dimana artinya $G$, $Y_L'$, dan $RM$ secara simultan berpengaruh terhadap variabel $i$ sebesar 47.5%. Sedangkan sisanya (100%-47.5% = 52.5%) dipengaruhi oleh variabel lain di luar persamaan regresi linier yang kali ini kami teliti. Nilai 47.5% kurang cukup besar untuk persentase pengaruh $G$, $Y_L'$, dan $RM$ terhadap $i$. Dengan tidak signifikannya pengaruh $G$, $Y_L'$, dan $RM$ terhadap $i$, maka kami berpendapat bahwa model yang didapat belum cocok karena model tersebut terbatas dalam waktu yang pendek.
+	Sehingga menurut kami, Jepang memiliki kebijakan tersendiri untuk menentukan $Y$ tanpa melihat nilai $G$, $Y_L'$, dan $RM$. Perlu ditekankan bahwa tidak setiap negara memiliki model yang sama untuk perekonomiannya, dan pada negara Jepang terlihat bahwa ternyata nilai $G$, $Y_L'$, dan $RM$ tidak mempengaruhi nilai $i$ secara signifikan.
+
+# Kesimpulan 
+
+Setelah beberapa analisis yang kami lakukan terhadap sektor riil dan finansial di negara Jepang. Diperoleh bahwa tingkat suku bunga hampir tidak signifikan mempengaruhi perekonomian Jepang secara umum (GDP). Hal ini terlihat dari uji signifikansi parameter bagi i dan plot i terhadap variabel lain yang sulit dilihat hubungan kelinearannya. 
+
+Hal ini cocok dengan keadaan lapangan dimana Kebijakan Jepang untuk menurunkan tingkat suku bunga tidak mampu menyelesaikan permasalahan Jepang yang terjebak pada kondisi The Great Stagnation. Rendahnya tingkat suku bunga gagal untuk mendorong pengeluaran masyarakat Jepang sehingga kebijakan moneter menjadi tidak efektif pada negara tersebut, kondisi ini sering disebut sebagai Liquidity Trap. 
+
+Ketidakefektifan kebijakan ini kami kira berasal dari rendahnya kesadaran konsumsi masyarakat Jepang sehingga berapa banyak pun uang yang beredar dan rendahnya tingkat suku bunga, masyarakat Jepang akan tetap pada tingkat konsumsi yang relatif sama dan menyisakan uang lainnya untuk investasi atau tabungan.
+
+Maka dari itu, kami merekomendasikan untuk melakukan kebijakan moneter kualitatif dimana dilakukan himbauan kepada masyarakat mengenai konsumsi. Sehingga kesadaran akan konsumsi menjadi tinggi dan kebijakan moneter kuantitatif pun dapat menghasilkan hasil yang efektif.
